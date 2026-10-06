@@ -28,8 +28,17 @@ public class Main extends JFrame {
         cardLayout = new CardLayout();
         mainContainer = new JPanel(cardLayout);
 
-       
+        mainContainer.add(new LoginPanel(this), CARD_LOGIN);
+        mainContainer.add(new SignUpPanel(this), CARD_SIGNUP);
+        mainContainer.add(new MenuPanel(this), CARD_MENU);
+        mainContainer.add(new LeaderboardPanel(this), CARD_LEADERBOARD);
+        mainContainer.add(new PlayPanel(this), CARD_PLAY);
+        mainContainer.add(new TimesUpPanel(this), CARD_TIMEUP);
+
         add(mainContainer);
+        showCard(CARD_SIGNUP);
+        showCard(CARD_LOGIN);
+
     }
 
     public void showCard(String cardName) {
