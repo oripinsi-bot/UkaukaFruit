@@ -19,6 +19,10 @@ public class Main extends JFrame {
     private CardLayout cardLayout;
     private JPanel mainContainer;
 
+    public static String currentPlayerName = "";
+
+    private MenuPanel menuPanel;
+
     public Main() {
         setTitle("UkaUkaFruit");
         setSize(375, 812);
@@ -30,7 +34,8 @@ public class Main extends JFrame {
 
         mainContainer.add(new LoginPanel(this), CARD_LOGIN);
         mainContainer.add(new SignUpPanel(this), CARD_SIGNUP);
-        mainContainer.add(new MenuPanel(this), CARD_MENU);
+        menuPanel = new MenuPanel(this);  // ← Save the reference HERE
+        mainContainer.add(menuPanel, CARD_MENU);
         mainContainer.add(new LeaderboardPanel(this), CARD_LEADERBOARD);
         mainContainer.add(new PlayPanel(this), CARD_PLAY);
         mainContainer.add(new TimesUpPanel(this), CARD_TIMEUP);
@@ -38,10 +43,16 @@ public class Main extends JFrame {
         add(mainContainer);
         showCard(CARD_SIGNUP);
         showCard(CARD_LOGIN);
-
     }
 
     public void showCard(String cardName) {
+
+        // ให้อัปเดตชื่อผู้เล่นก่อนแสดงหน้า Menu
+        if (cardName.equals(CARD_MENU)) {
+            menuPanel.updatePlayerName();
+        }
+
+
         cardLayout.show(mainContainer, cardName);
     }
 
