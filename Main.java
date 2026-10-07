@@ -27,8 +27,8 @@ public class Main extends JFrame {
 
         cardLayout = new CardLayout();
         mainContainer = new JPanel(cardLayout);
-
-       
+        
+        mainContainer.add(new TimesUpPanel(this), CARD_TIMEUP);
         add(mainContainer);
     }
 
