@@ -13,7 +13,7 @@ public class PlayPanel extends JPanel implements ActionListener, KeyListener {
     private Main game;
     private GameManager manager;
     private ArrayList<FallingObject> fallingObjects;
-    private ArrayList<FallingObject.Type> typeBag; // ถุงสุ่มของให้ออกเท่ากัน
+    private ArrayList<FallingObject.Type> typeBag; // เอาไว้เก็บให้ของออกเท่ากัน
     private Random random;
 
     private Timer timer;
@@ -27,7 +27,7 @@ public class PlayPanel extends JPanel implements ActionListener, KeyListener {
     private boolean rightPressed = false;
     private int slowTicks = 0; // ถ้านานกว่า 0 แสดงว่าโดนเห็ดพิษ (สถานะช้า)
 
-    // รูปภาพ
+    // รูปภาพตะกร้ากับพื้นหลัง
     private Image background;
     private Image basketImage;
 
@@ -76,6 +76,11 @@ public class PlayPanel extends JPanel implements ActionListener, KeyListener {
 
     private void gameTick() {
         tickCount++;
+
+         if (!isFocusOwner()) {
+            requestFocusInWindow();
+        }
+
 
         // 1. คำนวณการเคลื่อนที่ของตะกร้า
         int speed = 7;
