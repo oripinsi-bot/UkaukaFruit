@@ -17,6 +17,7 @@ public abstract class GameObject implements Drawable  {
     }
 
     public void update() {
+        y += speed;
         //อัปเดตตำแหน่งน้องผลไม้ที่ตกจากข้างบน ตาม speed
     }
 
@@ -32,5 +33,20 @@ public abstract class GameObject implements Drawable  {
     public double getY() { //อ่านค่า y
          return y; 
     }
+
+    // เช็คว่าวัตถุหล่นเลยขอบล่างหน้าจอหรือยัง
+    
+    public boolean isOutOfBounds(int screenHeight) {
+        return y > screenHeight;
+    }
+
+    // อ่านขนาดความกว้าง/สูง
+    public int getWidth() { 
+        return width; 
+    }
+
+    public int getHeight() {
+         return height; 
+        }
 
 }
