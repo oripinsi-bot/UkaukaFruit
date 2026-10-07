@@ -7,6 +7,10 @@ public class GameManager {
     private int score;
     private int timeLeftSeconds;
 
+    public GameManager() {
+        reset();
+    }
+
     public void reset() {
         // รีเซ็ตคะแนนและเวลาที่เหลือของเกมในแต่ละรอบ
         score = 0;
@@ -14,12 +18,16 @@ public class GameManager {
     }
 
     public void addScore(FallingObject obj) {
+        score += obj.scoreValue();
+        if (score < 0) score = 0; // กันคะแนนติดลบ
         // เพิ่มคะแนน
     }
 
     public void tickOneSecond() {
         // ลดเวลาที่เหลือของเกมลงทีละ 1 วินาที
-        timeLeftSeconds--;
+        if (timeLeftSeconds > 0) {
+            timeLeftSeconds--;
+        }
     }
 
     public boolean isTimeUp() {
