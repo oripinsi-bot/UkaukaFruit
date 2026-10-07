@@ -1,6 +1,10 @@
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 public class LeaderboardPanel extends JPanel {
@@ -9,10 +13,24 @@ public class LeaderboardPanel extends JPanel {
     private JTable table;
     private DefaultTableModel tableModel;
 
+    // รูปพื้นหลัง
+    private BufferedImage backgroundImage;
+
     public LeaderboardPanel(Main game) {
         this.game = game;
 
-        setBackground(Main.BG_DARK);
+        // โหลดรูปพื้นหลัง
+        try {
+            backgroundImage = ImageIO.read(
+                    new File("UkaukaFruit-main/images/background.png")
+            );
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // ทำให้พื้นหลังของ JPanel โปร่งใส
+        setOpaque(false);
+
         setLayout(new BorderLayout());
         setLayout(new BorderLayout(20, 20));
 
@@ -64,6 +82,10 @@ public class LeaderboardPanel extends JPanel {
 
         JScrollPane scrollPane = new JScrollPane(table);
 
+        // ทำให้พื้นหลังของ ScrollPane โปร่งใส
+        scrollPane.setOpaque(false);
+        scrollPane.getViewport().setOpaque(false);
+
         add(scrollPane, BorderLayout.CENTER);
 
         // สร้างปุ่ม
@@ -71,7 +93,7 @@ public class LeaderboardPanel extends JPanel {
                 new FlowLayout(FlowLayout.CENTER)
         );
 
-        bottomPanel.setBackground(Main.BG_DARK);
+        bottomPanel.setOpaque(false);
 
         JButton backButton = new JButton("BACK");
 
@@ -97,6 +119,23 @@ public class LeaderboardPanel extends JPanel {
         refreshTable();
 
     }
+
+    @Override
+        protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                if (backgroundImage != null) {
+                        Graphics2D g2 = (Graphics2D) g.create();
+                        g2.drawImage(
+                        backgroundImage,
+                        0,
+                        0,
+                        getWidth(),
+                        getHeight(),
+                        this
+                );
+                g2.dispose();
+                }
+        }
 
     public void refreshTable() {
         //อัปเดตข้อมูล Leaderboard

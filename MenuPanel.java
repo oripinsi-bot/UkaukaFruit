@@ -4,9 +4,12 @@
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import javax.imageio.ImageIO;
 
 
 public class MenuPanel extends JPanel{
@@ -24,32 +27,96 @@ public class MenuPanel extends JPanel{
     private Main game;
     private JLabel helloLabel;
 
+    // รูปพื้นหลัง
+    private BufferedImage backgroundImage;
+
     public MenuPanel(Main game) {
         //แสดงคำทักทาย
 
         this.game = game;
-        setLayout(new BorderLayout());
 
+        // โหลดรูปพื้นหลัง
+        try {
+            backgroundImage = ImageIO.read(
+                new File("UkaukaFruit-main/images/background.png")
+            );
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        setLayout(new BorderLayout(20, 20));
+
+        // ทำให้ JPanel โปร่งใส
+        setOpaque(false);
+
+        JPanel topPanel = new JPanel();
+
+        topPanel.setLayout(
+            new BoxLayout(topPanel, BoxLayout.Y_AXIS)
+        );
+
+        topPanel.setOpaque(false);
+
+        JLabel title = new JLabel("MENU",SwingConstants.CENTER);
+
+        title.setFont(new Font("Tahoma", Font.BOLD, 32));
+
+        title.setForeground(Color.WHITE);
+
+        title.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         String playerName = readPlayerName();
 
+        helloLabel = new JLabel("hello " + playerName,SwingConstants.CENTER);
+        helloLabel.setFont(new Font("Tahoma", Font.BOLD, 24));
+        helloLabel.setForeground(Color.WHITE);
+        helloLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        helloLabel = new JLabel("hello " + playerName, SwingConstants.CENTER);
-        helloLabel.setFont(new Font("Arial", Font.BOLD, 24));
+        // เพิ่ม MENU และ hello เข้า topPanel
+        topPanel.add(title);
+        topPanel.add(Box.createVerticalStrut(10));
+        topPanel.add(helloLabel);
 
-        add(helloLabel, BorderLayout.NORTH);
+        // เพิ่ม topPanel เข้า MenuPanel
+        add(topPanel, BorderLayout.NORTH);
 
         //การทำงานของแต่ละปุ่ม
 
         // สร้างปุ่ม
         JPanel buttonPanel = new JPanel();
 
+        buttonPanel.setLayout(
+            new BoxLayout(buttonPanel, BoxLayout.Y_AXIS)
+        );
+
+        //พื้นหลังโปร่งใส
+        buttonPanel.setOpaque(false);
+
         JButton playButton = new JButton("Play");
         JButton leaderBoardButton = new JButton("LeaderBoard");
         JButton backButton = new JButton("Back");
 
+        // กำหนดขนาดปุ่ม
+        Dimension buttonSize = new Dimension(180, 45);
+
+        playButton.setPreferredSize(buttonSize);
+        playButton.setMaximumSize(buttonSize);
+
+        leaderBoardButton.setPreferredSize(buttonSize);
+        leaderBoardButton.setMaximumSize(buttonSize);
+
+        backButton.setPreferredSize(buttonSize);
+        backButton.setMaximumSize(buttonSize);
+
+        // จัดตรงกลาง
+        playButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        leaderBoardButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        backButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+
         buttonPanel.add(playButton);
+        buttonPanel.add(Box.createVerticalStrut(15));
         buttonPanel.add(leaderBoardButton);
+        buttonPanel.add(Box.createVerticalStrut(15));
         buttonPanel.add(backButton);
 
         add(buttonPanel, BorderLayout.CENTER);
@@ -71,8 +138,33 @@ public class MenuPanel extends JPanel{
         
     }
 
+        // วาดพื้นหลัง
+    @Override
+    protected void paintComponent(Graphics g) {
+
+        super.paintComponent(g);
+
+        if (backgroundImage != null) {
+
+            Graphics2D g2 =
+                (Graphics2D) g.create();
+
+            g2.drawImage(
+                backgroundImage,
+                0,
+                0,
+                getWidth(),
+                getHeight(),
+                this
+            );
+
+            g2.dispose();
+
+        }
+
+    }
+
         //อ่านชื่อผู้เล่นจาก players.txt
-   
     private String readPlayerName() {
         try (BufferedReader br = new BufferedReader(new FileReader("players.txt"))) {
 
