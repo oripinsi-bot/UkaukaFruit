@@ -48,6 +48,7 @@ public class PlayPanel extends JPanel implements ActionListener, KeyListener {
 
         // ตั้งเวลาให้เกมรันทุกๆ 20 มิลลิวินาที (50 ครั้งต่อวินาที)
         timer = new Timer(20, this);
+        
     }
 
     // เริ่มเกมใหม่ (รีเซ็ตค่าทุกอย่าง)
@@ -213,7 +214,7 @@ public class PlayPanel extends JPanel implements ActionListener, KeyListener {
         // แสดงคำว่า SLOW! สีแดงกลางจอถ้าติดสถานะช้า
         if (slowTicks > 0) {
             g.setColor(Color.RED);
-            g.drawString("SLOW!", getWidth() / 2 - 25, 60);
+            g.drawString("SLOW!", getWidth() / 2 - 25, 250);
         }
     }
 }

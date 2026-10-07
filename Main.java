@@ -28,8 +28,12 @@ public class Main extends JFrame {
         cardLayout = new CardLayout();
         mainContainer = new JPanel(cardLayout);
 
-       
+        // หน้าเล่นเกม
+
+        PlayPanel playPanel = new PlayPanel(this);
+        mainContainer.add(playPanel, CARD_PLAY);
         add(mainContainer);
+        playPanel.startGame();
     }
 
     public void showCard(String cardName) {

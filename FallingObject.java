@@ -7,14 +7,14 @@ public class FallingObject extends GameObject {
  
     public enum Type {
         //ชนิดของวัตถุทั้งหมด
-    STARFRUIT("Images/star_fruit.png"),
-    PASSIONFRUIT("Images/passion_fruit.png"),
-    SALAK("Images/waive.png"),
-    DURIAN("Images/durian.png"),
-    DRAGONFRUIT("Images/dragon_fruit.png"),
-    BOMB("Images/bomb.png"),
-    SNAKE("Images/snake.png"),
-    MUSHROOM("Images/mushroom.png");
+    STARFRUIT("Images/star_fruit.png"), //+1 คะแนน
+    PASSIONFRUIT("Images/passion_fruit.png"), //+1 คะแนน
+    WAIVE("Images/waive.png"), //+1 คะแนน
+    DURIAN("Images/durian.png"), //+1 คะแนน
+    DRAGONFRUIT("Images/dragon_fruit.png"), //+1 คะแนน
+    BOMB("Images/bomb.png"), //-3 คะแนน
+    SNAKE("Images/snake.png"), //-1 คะแนน
+    MUSHROOM("Images/mushroom.png"); //ตะกร้าช้าลง
 
     private final String imagePath;
 
@@ -46,7 +46,7 @@ public class FallingObject extends GameObject {
     public boolean isObstacle() {
         //เช็คว่าใช่อุปสรรค
         if (type == Type.BOMB || type == Type.SNAKE || type == Type.MUSHROOM) {
-            return true;
+            return true; //รีเทิร์นเมื่อเป็นอุปสรรค
         }
         return false;
     }
