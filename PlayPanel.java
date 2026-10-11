@@ -103,6 +103,7 @@ public class PlayPanel extends JPanel implements ActionListener, KeyListener {
         }
 
         //  ขยับของที่กำลังตก และเช็คการชนตะกร้า
+        
         Rectangle basketBounds = new Rectangle(basketX + 10, getHeight() - basketH, basketW - 20, 30);
 
         for (int i = fallingObjects.size() - 1; i >= 0; i--) {
@@ -142,15 +143,24 @@ public class PlayPanel extends JPanel implements ActionListener, KeyListener {
         // ถ้าของหมดถุง ให้ใส่ชนิดของวัตถุทั้งหมดลงไปใหม่แล้วทำการสับ (Shuffle)
         if (typeBag.isEmpty()) {
             FallingObject.Type[] types = FallingObject.Type.values();
-            for (FallingObject.Type t : types) {
-                typeBag.add(t);
+            for (int i = 0; i < types.length; i++) {
+                 FallingObject.Type t = types[i];
+                 typeBag.add(t);
             }
             Collections.shuffle(typeBag); // สับถุงให้ออกแบบกระจายตัวเท่าๆ กัน
         }
 
         FallingObject.Type type = typeBag.remove(0);
-        int panelWidth = getWidth() > 0 ? getWidth() : 375;
-        double x = random.nextInt(Math.max(1, panelWidth - 50));
+
+        int panelWidth;
+        if (getWidth() > 0) {
+            panelWidth = getWidth();
+        } 
+        else {
+                panelWidth = 375;
+        }
+        
+        double x = random.nextInt(Math.max(1, panelWidth - 92));
         double fallingSpeed = 5 + random.nextInt(4); // ความเร็วสุ่ม 5 ถึง 8
 
         fallingObjects.add(new FallingObject(type, x, fallingSpeed));
@@ -197,10 +207,11 @@ public class PlayPanel extends JPanel implements ActionListener, KeyListener {
         //วาดพื้นหลัง
         g.drawImage(background, 0, 0, getWidth(), getHeight(), null);
 
-        //วาดวัตถุที่กำลังตก
-        for (FallingObject obj : fallingObjects) {
-            obj.draw((Graphics2D) g);
-        }
+        //***วาดวัตถุที่กำลังตก***
+        for (int i = 0; i < fallingObjects.size(); i++) {   //วนลูปอ่านวัตถุทีละตัว ใน List
+        FallingObject obj = fallingObjects.get(i);   //ดึงวัตถุในตำแหน่ง index ที่ i ออกจาก List เก็บที่ obj
+        obj.draw((Graphics2D) g);   //แปลงกราฟิกg เป็น Graphics2D ห้วัตถุชิ้นนั้นวาดตัวเองลงจอ
+}
 
         // วาดตะกร้าผู้เล่น
         g.drawImage(basketImage, basketX, getHeight() - basketH - 5, basketW, basketH, null);
