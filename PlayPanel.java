@@ -21,8 +21,8 @@ public class PlayPanel extends JPanel implements ActionListener, KeyListener {
 
     // ตะกร้าผู้เล่น
     private int basketX;
-    private int basketW = 110;
-    private int basketH = 130;
+    private int basketW = 130;
+    private int basketH = 150;
     private boolean leftPressed = false;
     private boolean rightPressed = false;
     private int slowTicks = 0; // ถ้านานกว่า 0 แสดงว่าโดนเห็ดพิษ (สถานะช้า)
@@ -83,11 +83,11 @@ public class PlayPanel extends JPanel implements ActionListener, KeyListener {
         }
 
 
-        // 1. คำนวณการเคลื่อนที่ของตะกร้า
-        int speed = 7;
-        if (slowTicks > 0) {
-            speed = 3; // ติดสถานะช้า
-            slowTicks--;
+        // คำนวณการเคลื่อนที่ของตะกร้า
+        int speed = 7; //ความเร็วปกติ
+        if (slowTicks > 0) { // โดนเห็ด slowTicks = 150;
+            speed = 3; // เร็ว = 3 วิ
+            slowTicks--; // ลดเวลาสถานะช้าลงทีละ 1 tick (20 ms)
         }
 
         if (leftPressed && basketX > 0) {
@@ -97,12 +97,12 @@ public class PlayPanel extends JPanel implements ActionListener, KeyListener {
             basketX += speed;
         }
 
-        // 2. สุ่มของตกใหม่ทุกๆ 30 รอบ (~0.6 วินาที)
-        if (tickCount % 30 == 0) {
+        //  สุ่มของตกใหม่ทุกๆ 47 รอบ (~0.94 วินาที) 
+        if (tickCount % 47 == 0) {
             spawnFallingObject();
         }
 
-        // 3. ขยับของที่กำลังตก และเช็คการชนตะกร้า
+        //  ขยับของที่กำลังตก และเช็คการชนตะกร้า
         Rectangle basketBounds = new Rectangle(basketX + 10, getHeight() - basketH, basketW - 20, 30);
 
         for (int i = fallingObjects.size() - 1; i >= 0; i--) {
@@ -126,7 +126,7 @@ public class PlayPanel extends JPanel implements ActionListener, KeyListener {
             }
         }
 
-        // 4. นับถอยหลังเวลาทุกๆ 1 วินาที (50 รอบ * 20ms = 1000ms)
+        //นับถอยหลังเวลาทุกๆ 1 วินาที (50 รอบ * 20ms = 1000ms)
         if (tickCount % 50 == 0) {
             manager.tickOneSecond();
             if (manager.isTimeUp()) {
@@ -151,7 +151,7 @@ public class PlayPanel extends JPanel implements ActionListener, KeyListener {
         FallingObject.Type type = typeBag.remove(0);
         int panelWidth = getWidth() > 0 ? getWidth() : 375;
         double x = random.nextInt(Math.max(1, panelWidth - 50));
-        double fallingSpeed = 3 + random.nextInt(4); // ความเร็วสุ่ม 3 ถึง 6
+        double fallingSpeed = 5 + random.nextInt(4); // ความเร็วสุ่ม 5 ถึง 8
 
         fallingObjects.add(new FallingObject(type, x, fallingSpeed));
     }
@@ -186,7 +186,7 @@ public class PlayPanel extends JPanel implements ActionListener, KeyListener {
 
     @Override
     public void keyTyped(KeyEvent e) {
-        // ไม่ได้ใช้งาน แต่ต้องมีไว้เพราะ implements KeyListener
+       
     }
 
     // --- การวาดกราฟิกบน Panel ---
@@ -194,18 +194,18 @@ public class PlayPanel extends JPanel implements ActionListener, KeyListener {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        // 1. วาดพื้นหลัง
+        //วาดพื้นหลัง
         g.drawImage(background, 0, 0, getWidth(), getHeight(), null);
 
-        // 2. วาดวัตถุที่กำลังตก
+        //วาดวัตถุที่กำลังตก
         for (FallingObject obj : fallingObjects) {
             obj.draw((Graphics2D) g);
         }
 
-        // 3. วาดตะกร้าผู้เล่น
+        // วาดตะกร้าผู้เล่น
         g.drawImage(basketImage, basketX, getHeight() - basketH - 5, basketW, basketH, null);
 
-        // 4. วาดตัวหนังสือ เวลา และคะแนน (HUD)
+        //วาดตัวหนังสือ เวลา และคะแนน (HUD)
         g.setColor(Color.WHITE);
         g.setFont(new Font("SansSerif", Font.BOLD, 18));
         g.drawString("TIME: " + manager.getTimeLeftSeconds(), 15, 35);
