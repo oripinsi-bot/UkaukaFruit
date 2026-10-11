@@ -11,11 +11,13 @@ public class TimesUpPanel extends JPanel {
     private final JLabel rankLabel;
     private final JLabel bestScoreLabel;
     private final JLabel neighborRanksLabel;
+    private final Image background;
 
     public TimesUpPanel(Main game) {
         this.game = game;
         setLayout(new GridBagLayout());
         setBackground(Main.BG_DARK);
+        background = new ImageIcon("Images/background.png").getImage();
 
         JPanel box = new JPanel();
         box.setLayout(new BoxLayout(box, BoxLayout.Y_AXIS));
@@ -40,6 +42,7 @@ public class TimesUpPanel extends JPanel {
             l.setAlignmentX(Component.CENTER_ALIGNMENT);
         }
 
+        // Play Again: Main.showCard(CARD_PLAY) จะเรียก startGame() ให้เอง (เริ่มเกมใหม่จริง)
         JButton playAgainBtn = new JButton("Play Again");
         playAgainBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
         playAgainBtn.addActionListener(e -> game.showCard(Main.CARD_PLAY));
@@ -67,21 +70,49 @@ public class TimesUpPanel extends JPanel {
         box.add(menuBtn);
 
         add(box);
+
     }
 
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        if (background != null) {
+            g.drawImage(background, 0, 0, getWidth(), getHeight(), this);
+        }
+    }
+
+    /**
+     * แสดงผลหลังจบเกม (Main เรียกให้ หลังบันทึกคะแนนลง Leaderboard แล้ว)
+     * อันดับ = ตำแหน่งของผู้เล่นคนนี้บน Leaderboard (Leaderboard เก็บคะแนนที่ดีที่สุดของแต่ละคน)
+     */
     public void showResult(int finalScore, Leaderboard leaderboard, Player player) {
         scoreLabel.setText("คะแนนของคุณ: " + finalScore);
 
-        int rank = leaderboard.getRankOf(finalScore);
-        rankLabel.setText("อันดับที่: " + rank);
-
         List<Leaderboard.ScoreEntry> all = leaderboard.getAll();
-        StringBuilder sb = new StringBuilder();
-        if (rank - 2 >= 0 && rank - 2 < all.size()) {
-            sb.append("อันดับ ").append(rank - 1).append(": ").append(all.get(rank - 2).score).append("   ");
+
+        // หาอันดับของผู้เล่นคนนี้ในลิสต์ที่เรียงจากมากไปน้อย (ไม่เจอให้ -1)
+        int rank = -1;
+        for (int i = 0; i < all.size(); i++) {
+            if (all.get(i).getName().equalsIgnoreCase(player.getName())) {
+                rank = i + 1;
+                break;
+            }
         }
-        if (rank < all.size()) {
-            sb.append("อันดับ ").append(rank + 1).append(": ").append(all.get(rank).score);
+
+        StringBuilder sb = new StringBuilder();
+        if (rank == -1) {
+            rankLabel.setText("อันดับที่: -");
+        } else {
+            rankLabel.setText("อันดับที่: " + rank);
+
+            // อันดับก่อนหน้า (ถ้ามี)
+            if (rank >= 2) {
+                sb.append("อันดับ ").append(rank - 1).append(": ").append(all.get(rank - 2).getScore()).append("   ");
+            }
+            // อันดับถัดไป (ถ้ามี)
+            if (rank < all.size()) {
+                sb.append("อันดับ ").append(rank + 1).append(": ").append(all.get(rank).getScore());
+            }
         }
         neighborRanksLabel.setText(sb.toString());
 
