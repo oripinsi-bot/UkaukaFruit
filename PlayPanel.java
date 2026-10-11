@@ -21,8 +21,8 @@ public class PlayPanel extends JPanel implements ActionListener, KeyListener {
 
     // ตะกร้าผู้เล่น
     private int basketX;
-    private int basketW = 130;
-    private int basketH = 150;
+    private int basketW = 135;
+    private int basketH = 155;
     private boolean leftPressed = false;
     private boolean rightPressed = false;
     private int slowTicks = 0; // ถ้านานกว่า 0 แสดงว่าโดนเห็ดพิษ (สถานะช้า)
@@ -53,6 +53,7 @@ public class PlayPanel extends JPanel implements ActionListener, KeyListener {
 
     // เริ่มเกมใหม่ (รีเซ็ตค่าทุกอย่าง)
     public void startGame() {
+         timer.stop(); //  กัน Timer ซ้อนถ้ากดเริ่มซ้ำ
         manager.reset();
         fallingObjects.clear();
         typeBag.clear();
@@ -62,7 +63,12 @@ public class PlayPanel extends JPanel implements ActionListener, KeyListener {
         rightPressed = false;
 
         // วางตะกร้าไว้ตรงกลางหน้าจอ
-        int panelWidth = getWidth() > 0 ? getWidth() : 375;
+        int panelWidth;
+        if (getWidth() > 0) {// หน้าจอได้ขนาดความกว้างไหม
+        panelWidth = getWidth(); // พร้อม ให้ใช้ความกว้างจริงของหน้าจอ
+        } else {
+            panelWidth = 375;  // ถ้าหน้าจอยังไม่พร้อม ใช้ค่าสำรองเป็น 375 px
+        }
         basketX = (panelWidth - basketW) / 2;
 
         timer.start();
@@ -104,7 +110,11 @@ public class PlayPanel extends JPanel implements ActionListener, KeyListener {
 
         //  ขยับของที่กำลังตก และเช็คการชนตะกร้า
         
-        Rectangle basketBounds = new Rectangle(basketX + 10, getHeight() - basketH, basketW - 20, 30);
+        int basketTop = getHeight() - basketH + 20;
+        Rectangle basketBounds = new Rectangle(
+                basketX + 10,
+                basketTop + 50,
+                basketW - 20,30);
 
         for (int i = fallingObjects.size() - 1; i >= 0; i--) {
             FallingObject obj = fallingObjects.get(i);
@@ -214,7 +224,8 @@ public class PlayPanel extends JPanel implements ActionListener, KeyListener {
 }
 
         // วาดตะกร้าผู้เล่น
-        g.drawImage(basketImage, basketX, getHeight() - basketH - 5, basketW, basketH, null);
+        g.drawImage(basketImage, basketX, getHeight() - basketH +20, basketW, basketH, null);
+
 
         //วาดตัวหนังสือ เวลา และคะแนน (HUD)
         g.setColor(Color.WHITE);
