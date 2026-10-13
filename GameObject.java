@@ -4,11 +4,13 @@ import java.awt.*;
  */
 public abstract class GameObject implements Drawable  {
 
+    public static final int DEFAULT_SIZE = 92;
+
     protected double x;
     protected double y;
     protected double speed;
-    protected int width = 64;  //ความกว้างผลไม้
-    protected int height = 64; //ความสูงผลไม้
+    protected int width = DEFAULT_SIZE;  //ความกว้างผลไม้
+    protected int height = DEFAULT_SIZE; //ความสูงผลไม้
 
     public GameObject(double x, double y, double speed) { //Constructor
         this.x = x;
@@ -40,7 +42,7 @@ public abstract class GameObject implements Drawable  {
         return y > screenHeight;
     }
 
-    // อ่านขนาดความกว้าง/สูง
+    // อ่านขนาดความกว้าง/สูง ของวัตถุ
     public int getWidth() { 
         return width; 
     }

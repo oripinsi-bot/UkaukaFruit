@@ -10,6 +10,22 @@ import java.util.Random;
  */
 public class PlayPanel extends JPanel implements ActionListener, KeyListener {
 
+    //กำหนดตัวแปรค่าคงที่จะได้ไม่ต้องเปลี่ยนค่าทีละที่
+    private static final int TICK_MS = 20;
+    private static final int TICKS_PER_SECOND = 1000 / TICK_MS;    // 50
+    private static final int SPAWN_INTERVAL_TICKS = 47;   // ~0.94 วินาที
+    private static final int NORMAL_SPEED = 7;
+    private static final int SLOW_SPEED = 3; //โดนน้องเห็ด
+    private static final int SLOW_DURATION_TICKS = 3 * TICKS_PER_SECOND;   // 3 วินาที
+
+    //กรอบตัวรับของ
+    private static final int CATCH_OFFSET_Y = 28; // ระยะจากขอบบนรูปลิงลงมาถึงมือ
+    private static final int CATCH_HEIGHT = 30;
+    private static final int CATCH_INSET_LEFT = 8;  //  ย่นกรอบรับของเข้ามาจากขอบซ้ายรูปลิง 
+    private static final int CATCH_INSET_RIGHT = 10; // ย่นจากขอบขวา
+    private static final int BASKET_BOTTOM_MARGIN = -20; // ระยะจากขอบล่างจอถึงก้นรูปลิง
+    private static final boolean DEBUG_HITBOX = false; // เปลี่ยนเป็น true เพื่อดูกรอบชนตอนจูนค่า
+
     private Main game;
     private GameManager manager;
     private ArrayList<FallingObject> fallingObjects;
@@ -21,15 +37,16 @@ public class PlayPanel extends JPanel implements ActionListener, KeyListener {
 
     // ตะกร้าผู้เล่น
     private int basketX;
-    private int basketW = 135;
-    private int basketH = 155;
+    private int basketW = 130;
+    private int basketH = 150;
     private boolean leftPressed = false;
     private boolean rightPressed = false;
-    private int slowTicks = 0; // ถ้านานกว่า 0 แสดงว่าโดนเห็ดพิษ (สถานะช้า)
+    private int slowTicks = 0; // ถ้านานกว่า 0 แสดงว่าโดนน้องเห็ดพิษ (ช้า 3 วิ)
 
     // รูปภาพตะกร้ากับพื้นหลัง
     private Image background;
     private Image basketImage;
+    private Image scaledBackground; //พื้นหลังที่ย่อแล้ว
 
     public PlayPanel(Main game) {
         this.game = game;
@@ -40,20 +57,21 @@ public class PlayPanel extends JPanel implements ActionListener, KeyListener {
 
         // โหลดรูปภาพจากโฟลเดอร์ Images
         background = new ImageIcon("Images/background.png").getImage();
-        basketImage = new ImageIcon("Images/monkey.png").getImage();
+        basketImage = FallingObject.scaleImage(
+                new ImageIcon("Images/monkey.png").getImage(), basketW, basketH); //ย่อครั้งเดียว
+        FallingObject.preloadImages(); //โหลดรูปผลไม้ล่วงหน้า
 
         // ตั้งค่า Panel รับปุ่มกด
         setFocusable(true);
         addKeyListener(this);
 
         // ตั้งเวลาให้เกมรันทุกๆ 20 มิลลิวินาที (50 ครั้งต่อวินาที)
-        timer = new Timer(20, this);
-        
+        timer = new Timer(TICK_MS, this); 
     }
 
     // เริ่มเกมใหม่ (รีเซ็ตค่าทุกอย่าง)
     public void startGame() {
-         timer.stop(); //  กัน Timer ซ้อนถ้ากดเริ่มซ้ำ
+        timer.stop(); // กัน Timer ซ้อนถ้ากดเริ่มซ้ำ
         manager.reset();
         fallingObjects.clear();
         typeBag.clear();
@@ -63,12 +81,7 @@ public class PlayPanel extends JPanel implements ActionListener, KeyListener {
         rightPressed = false;
 
         // วางตะกร้าไว้ตรงกลางหน้าจอ
-        int panelWidth;
-        if (getWidth() > 0) {// หน้าจอได้ขนาดความกว้างไหม
-        panelWidth = getWidth(); // พร้อม ให้ใช้ความกว้างจริงของหน้าจอ
-        } else {
-            panelWidth = 375;  // ถ้าหน้าจอยังไม่พร้อม ใช้ค่าสำรองเป็น 375 px
-        }
+        int panelWidth = getWidth() > 0 ? getWidth() : 375;
         basketX = (panelWidth - basketW) / 2;
 
         timer.start();
@@ -84,37 +97,33 @@ public class PlayPanel extends JPanel implements ActionListener, KeyListener {
     private void gameTick() {
         tickCount++;
 
-         if (!isFocusOwner()) {
+        if (!isFocusOwner()) {
             requestFocusInWindow();
         }
 
-
-        // คำนวณการเคลื่อนที่ของตะกร้า
-        int speed = 7; //ความเร็วปกติ
-        if (slowTicks > 0) { // โดนเห็ด slowTicks = 150;
-            speed = 3; // เร็ว = 3 วิ
-            slowTicks--; // ลดเวลาสถานะช้าลงทีละ 1 tick (20 ms)
+        //คำนวณการเคลื่อนที่ของตะกร้า
+        int speed = NORMAL_SPEED;
+        if (slowTicks > 0) {
+            speed = SLOW_SPEED; // ติดสถานะช้า
+            slowTicks--;
         }
 
-        if (leftPressed && basketX > 0) {
+        if (leftPressed) {
             basketX -= speed;
         }
-        if (rightPressed && basketX < getWidth() - basketW) {
+        if (rightPressed) {
             basketX += speed;
         }
+        //  ให้ตะกร้าอยู่ในจอเสมอ
+        basketX = Math.max(0, Math.min(basketX, getWidth() - basketW));
 
-        //  สุ่มของตกใหม่ทุกๆ 47 รอบ (~0.94 วินาที) 
-        if (tickCount % 47 == 0) {
+        // 2. สุ่มของตกใหม่ทุกๆ 47 รอบ (~0.94 วินาที)
+        if (tickCount % SPAWN_INTERVAL_TICKS == 0) {
             spawnFallingObject();
         }
 
-        //  ขยับของที่กำลังตก และเช็คการชนตะกร้า
-        
-        int basketTop = getHeight() - basketH + 20;
-        Rectangle basketBounds = new Rectangle(
-                basketX + 10,
-                basketTop + 50,
-                basketW - 20,30);
+        // ขยับของที่กำลังตก และเช็คการชนตะกร้า
+        Rectangle basketBounds = getCatchBounds(); // ใช้กรอบเดียวกับที่วาดใน debug
 
         for (int i = fallingObjects.size() - 1; i >= 0; i--) {
             FallingObject obj = fallingObjects.get(i);
@@ -124,21 +133,21 @@ public class PlayPanel extends JPanel implements ActionListener, KeyListener {
             if (obj.getBounds().intersects(basketBounds)) {
                 manager.addScore(obj);
 
-                // ถ้าชนเห็ดพิษ ติดสถานะช้า 3 วินาที (150 รอบ * 20ms = 3000ms)
+                // ถ้าชนน้องเห็ดพิษ ติดสถานะช้า 3 วินาที
                 if (obj.getType() == FallingObject.Type.MUSHROOM) {
-                    slowTicks = 150;
+                    slowTicks = SLOW_DURATION_TICKS; // [แก้ #5]
                 }
 
                 fallingObjects.remove(i); // ลบออกเมื่อเก็บได้
-            } 
+            }
             // เช็คว่าตกเลยขอบล่างหน้าจอหรือยัง
             else if (obj.isOutOfBounds(getHeight())) {
                 fallingObjects.remove(i);
             }
         }
 
-        //นับถอยหลังเวลาทุกๆ 1 วินาที (50 รอบ * 20ms = 1000ms)
-        if (tickCount % 50 == 0) {
+        // นับถอยหลังเวลาทุกๆ 1 วินาที (50 รอบ * 20ms = 1000ms)
+        if (tickCount % TICKS_PER_SECOND == 0) { // [แก้ #5]
             manager.tickOneSecond();
             if (manager.isTimeUp()) {
                 endGame();
@@ -149,28 +158,37 @@ public class PlayPanel extends JPanel implements ActionListener, KeyListener {
         repaint();
     }
 
+    // กรอบรับของของตะกร้า สร้างที่เดียว ใช้ทั้งเช็คชนและวาด debug
+    private Rectangle getCatchBounds() {
+        int basketTop = getHeight() - basketH - BASKET_BOTTOM_MARGIN;
+        return new Rectangle(
+                basketX + CATCH_INSET_LEFT,
+                basketTop + CATCH_OFFSET_Y,
+                basketW - CATCH_INSET_LEFT - CATCH_INSET_RIGHT,
+                CATCH_HEIGHT);
+    }
+
     private void spawnFallingObject() {
         // ถ้าของหมดถุง ให้ใส่ชนิดของวัตถุทั้งหมดลงไปใหม่แล้วทำการสับ (Shuffle)
         if (typeBag.isEmpty()) {
             FallingObject.Type[] types = FallingObject.Type.values();
-            for (int i = 0; i < types.length; i++) {
-                 FallingObject.Type t = types[i];
-                 typeBag.add(t);
-            }
+           for (int i = 0; i < types.length; i++) {
+             FallingObject.Type t = types[i];
+             typeBag.add(t);
+}
             Collections.shuffle(typeBag); // สับถุงให้ออกแบบกระจายตัวเท่าๆ กัน
         }
 
         FallingObject.Type type = typeBag.remove(0);
-
-        int panelWidth;
-        if (getWidth() > 0) {
+         int panelWidth;
+         if (getWidth() > 0) {
             panelWidth = getWidth();
-        } 
-        else {
-                panelWidth = 375;
+        } else {
+            panelWidth = 375; 
         }
-        
-        double x = random.nextInt(Math.max(1, panelWidth - 92));
+
+        // ใช้ความกว้างผลไม้จริง ของจะได้ไม่ล้นขอบขวา
+        double x = random.nextInt(Math.max(1, panelWidth - GameObject.DEFAULT_SIZE));
         double fallingSpeed = 5 + random.nextInt(4); // ความเร็วสุ่ม 5 ถึง 8
 
         fallingObjects.add(new FallingObject(type, x, fallingSpeed));
@@ -206,7 +224,7 @@ public class PlayPanel extends JPanel implements ActionListener, KeyListener {
 
     @Override
     public void keyTyped(KeyEvent e) {
-       
+
     }
 
     // --- การวาดกราฟิกบน Panel ---
@@ -214,20 +232,38 @@ public class PlayPanel extends JPanel implements ActionListener, KeyListener {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        //วาดพื้นหลัง
-        g.drawImage(background, 0, 0, getWidth(), getHeight(), null);
+        Graphics2D g2 = (Graphics2D) g; // [แก้ #13] เอา antialiasing ออก ให้เบาลง
 
-        //***วาดวัตถุที่กำลังตก***
-        for (int i = 0; i < fallingObjects.size(); i++) {   //วนลูปอ่านวัตถุทีละตัว ใน List
-        FallingObject obj = fallingObjects.get(i);   //ดึงวัตถุในตำแหน่ง index ที่ i ออกจาก List เก็บที่ obj
-        obj.draw((Graphics2D) g);   //แปลงกราฟิกg เป็น Graphics2D ห้วัตถุชิ้นนั้นวาดตัวเองลงจอ
+        //วาดพื้นหลัง
+        if (scaledBackground == null
+                || scaledBackground.getWidth(null) != getWidth()
+                || scaledBackground.getHeight(null) != getHeight()) {
+            scaledBackground = FallingObject.scaleImage(background, getWidth(), getHeight());
+        }
+        g.drawImage(scaledBackground, 0, 0, null); //ไม่ย่อภาพพื้นหลังทุกเฟรม
+
+        //วาดวัตถุที่กำลังตก
+       for (int i = 0; i < fallingObjects.size(); i++) {
+    FallingObject obj = fallingObjects.get(i);
+    obj.draw(g2);
 }
 
-        // วาดตะกร้าผู้เล่น
-        g.drawImage(basketImage, basketX, getHeight() - basketH +20, basketW, basketH, null);
+        //วาดตะกร้าผู้เล่น
+        g.drawImage(basketImage, basketX, getHeight() - basketH - BASKET_BOTTOM_MARGIN, null);
 
+        // โหมด debug: แสดงกรอบรับของ (เขียว) และกรอบผลไม้ (เหลือง)
+        if (DEBUG_HITBOX) {
+            g.setColor(Color.GREEN);
+            Rectangle c = getCatchBounds();
+            g.drawRect(c.x, c.y, c.width, c.height);
+            g.setColor(Color.YELLOW);
+            for (FallingObject obj : fallingObjects) {
+                Rectangle b = obj.getBounds();
+                g.drawRect(b.x, b.y, b.width, b.height);
+            }
+        }
 
-        //วาดตัวหนังสือ เวลา และคะแนน (HUD)
+        // วาดตัวหนังสือ เวลา และคะแนน (HUD)
         g.setColor(Color.WHITE);
         g.setFont(new Font("SansSerif", Font.BOLD, 18));
         g.drawString("TIME: " + manager.getTimeLeftSeconds(), 15, 35);
@@ -238,5 +274,7 @@ public class PlayPanel extends JPanel implements ActionListener, KeyListener {
             g.setColor(Color.RED);
             g.drawString("SLOW!", getWidth() / 2 - 25, 250);
         }
+
+      
     }
 }
