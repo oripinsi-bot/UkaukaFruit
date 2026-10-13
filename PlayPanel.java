@@ -10,18 +10,18 @@ import java.util.Random;
  */
 public class PlayPanel extends JPanel implements ActionListener, KeyListener {
 
-    //กำหนดตัวแปรค่าคงที่จะได้ไม่ต้องเปลี่ยนค่าทีละที่
+    // กำหนดตัวแปรค่าคงที่จะได้ไม่ต้องเปลี่ยนค่าทีละที่
     private static final int TICK_MS = 20;
-    private static final int TICKS_PER_SECOND = 1000 / TICK_MS;    // 50
-    private static final int SPAWN_INTERVAL_TICKS = 47;   // ~0.94 วินาที
+    private static final int TICKS_PER_SECOND = 1000 / TICK_MS; // 50
+    private static final int SPAWN_INTERVAL_TICKS = 47; // ~0.94 วินาที
     private static final int NORMAL_SPEED = 7;
-    private static final int SLOW_SPEED = 3; //โดนน้องเห็ด
-    private static final int SLOW_DURATION_TICKS = 3 * TICKS_PER_SECOND;   // 3 วินาที
+    private static final int SLOW_SPEED = 3; // โดนน้องเห็ด
+    private static final int SLOW_DURATION_TICKS = 3 * TICKS_PER_SECOND; // 3 วินาที
 
-    //กรอบตัวรับของ
+    // กรอบตัวรับของ
     private static final int CATCH_OFFSET_Y = 28; // ระยะจากขอบบนรูปลิงลงมาถึงมือ
     private static final int CATCH_HEIGHT = 30;
-    private static final int CATCH_INSET_LEFT = 8;  //  ย่นกรอบรับของเข้ามาจากขอบซ้ายรูปลิง 
+    private static final int CATCH_INSET_LEFT = 8; // ย่นกรอบรับของเข้ามาจากขอบซ้ายรูปลิง
     private static final int CATCH_INSET_RIGHT = 10; // ย่นจากขอบขวา
     private static final int BASKET_BOTTOM_MARGIN = -20; // ระยะจากขอบล่างจอถึงก้นรูปลิง
     private static final boolean DEBUG_HITBOX = false; // เปลี่ยนเป็น true เพื่อดูกรอบชนตอนจูนค่า
@@ -46,7 +46,7 @@ public class PlayPanel extends JPanel implements ActionListener, KeyListener {
     // รูปภาพตะกร้ากับพื้นหลัง
     private Image background;
     private Image basketImage;
-    private Image scaledBackground; //พื้นหลังที่ย่อแล้ว
+    private Image scaledBackground; // พื้นหลังที่ย่อแล้ว
 
     public PlayPanel(Main game) {
         this.game = game;
@@ -58,15 +58,15 @@ public class PlayPanel extends JPanel implements ActionListener, KeyListener {
         // โหลดรูปภาพจากโฟลเดอร์ Images
         background = new ImageIcon("Images/background.png").getImage();
         basketImage = FallingObject.scaleImage(
-                new ImageIcon("Images/monkey.png").getImage(), basketW, basketH); //ย่อครั้งเดียว
-        FallingObject.preloadImages(); //โหลดรูปผลไม้ล่วงหน้า
+                new ImageIcon("Images/monkey.png").getImage(), basketW, basketH); // ย่อครั้งเดียว
+        FallingObject.preloadImages(); // โหลดรูปผลไม้ล่วงหน้า
 
         // ตั้งค่า Panel รับปุ่มกด
         setFocusable(true);
         addKeyListener(this);
 
         // ตั้งเวลาให้เกมรันทุกๆ 20 มิลลิวินาที (50 ครั้งต่อวินาที)
-        timer = new Timer(TICK_MS, this); 
+        timer = new Timer(TICK_MS, this);
     }
 
     // เริ่มเกมใหม่ (รีเซ็ตค่าทุกอย่าง)
@@ -81,7 +81,12 @@ public class PlayPanel extends JPanel implements ActionListener, KeyListener {
         rightPressed = false;
 
         // วางตะกร้าไว้ตรงกลางหน้าจอ
-        int panelWidth = getWidth() > 0 ? getWidth() : 375;
+        int panelWidth;
+        if (getWidth() > 0) {// หน้าจอได้ขนาดความกว้างไหม
+            panelWidth = getWidth(); // พร้อม ให้ใช้ความกว้างจริงของหน้าจอ
+        } else {
+            panelWidth = 375; // ถ้าหน้าจอยังไม่พร้อม ใช้ค่าสำรองเป็น 375 px
+        }
         basketX = (panelWidth - basketW) / 2;
 
         timer.start();
@@ -101,7 +106,7 @@ public class PlayPanel extends JPanel implements ActionListener, KeyListener {
             requestFocusInWindow();
         }
 
-        //คำนวณการเคลื่อนที่ของตะกร้า
+        // คำนวณการเคลื่อนที่ของตะกร้า
         int speed = NORMAL_SPEED;
         if (slowTicks > 0) {
             speed = SLOW_SPEED; // ติดสถานะช้า
@@ -114,10 +119,10 @@ public class PlayPanel extends JPanel implements ActionListener, KeyListener {
         if (rightPressed) {
             basketX += speed;
         }
-        //  ให้ตะกร้าอยู่ในจอเสมอ
+        // ให้ตะกร้าอยู่ในจอเสมอ
         basketX = Math.max(0, Math.min(basketX, getWidth() - basketW));
 
-        // 2. สุ่มของตกใหม่ทุกๆ 47 รอบ (~0.94 วินาที)
+        //สุ่มของตกใหม่ทุกๆ 47 รอบ (~0.94 วินาที)
         if (tickCount % SPAWN_INTERVAL_TICKS == 0) {
             spawnFallingObject();
         }
@@ -172,19 +177,19 @@ public class PlayPanel extends JPanel implements ActionListener, KeyListener {
         // ถ้าของหมดถุง ให้ใส่ชนิดของวัตถุทั้งหมดลงไปใหม่แล้วทำการสับ (Shuffle)
         if (typeBag.isEmpty()) {
             FallingObject.Type[] types = FallingObject.Type.values();
-           for (int i = 0; i < types.length; i++) {
-             FallingObject.Type t = types[i];
-             typeBag.add(t);
-}
+            for (int i = 0; i < types.length; i++) {
+                FallingObject.Type t = types[i];
+                typeBag.add(t);
+            }
             Collections.shuffle(typeBag); // สับถุงให้ออกแบบกระจายตัวเท่าๆ กัน
         }
 
         FallingObject.Type type = typeBag.remove(0);
-         int panelWidth;
-         if (getWidth() > 0) {
+        int panelWidth;
+        if (getWidth() > 0) {
             panelWidth = getWidth();
         } else {
-            panelWidth = 375; 
+            panelWidth = 375;
         }
 
         // ใช้ความกว้างผลไม้จริง ของจะได้ไม่ล้นขอบขวา
@@ -232,23 +237,23 @@ public class PlayPanel extends JPanel implements ActionListener, KeyListener {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        Graphics2D g2 = (Graphics2D) g; // [แก้ #13] เอา antialiasing ออก ให้เบาลง
+        Graphics2D g2 = (Graphics2D) g; 
 
-        //วาดพื้นหลัง
+        // วาดพื้นหลัง
         if (scaledBackground == null
                 || scaledBackground.getWidth(null) != getWidth()
                 || scaledBackground.getHeight(null) != getHeight()) {
             scaledBackground = FallingObject.scaleImage(background, getWidth(), getHeight());
         }
-        g.drawImage(scaledBackground, 0, 0, null); //ไม่ย่อภาพพื้นหลังทุกเฟรม
+        g.drawImage(scaledBackground, 0, 0, null); // ไม่ย่อภาพพื้นหลังทุกเฟรม
 
-        //วาดวัตถุที่กำลังตก
-       for (int i = 0; i < fallingObjects.size(); i++) {
-    FallingObject obj = fallingObjects.get(i);
-    obj.draw(g2);
-}
+        // วาดวัตถุที่กำลังตก
+        for (int i = 0; i < fallingObjects.size(); i++) {
+            FallingObject obj = fallingObjects.get(i);
+            obj.draw(g2);
+        }
 
-        //วาดตะกร้าผู้เล่น
+        // วาดตะกร้าผู้เล่น
         g.drawImage(basketImage, basketX, getHeight() - basketH - BASKET_BOTTOM_MARGIN, null);
 
         // โหมด debug: แสดงกรอบรับของ (เขียว) และกรอบผลไม้ (เหลือง)
@@ -265,16 +270,15 @@ public class PlayPanel extends JPanel implements ActionListener, KeyListener {
 
         // วาดตัวหนังสือ เวลา และคะแนน (HUD)
         g.setColor(Color.WHITE);
-        g.setFont(new Font("SansSerif", Font.BOLD, 18));
-        g.drawString("TIME: " + manager.getTimeLeftSeconds(), 15, 35);
-        g.drawString("SCORE: " + manager.getScore(), getWidth() - 130, 35);
+        g.setFont(new Font("Tahoma", Font.BOLD, 18));
+        g.drawString("TIME: " + manager.getTimeLeftSeconds(), 17, 35);
+        g.drawString("SCORE: " + manager.getScore(), getWidth() - 110, 35);
 
         // แสดงคำว่า SLOW! สีแดงกลางจอถ้าติดสถานะช้า
         if (slowTicks > 0) {
-            g.setColor(Color.RED);
+           g.setColor(Color.decode("#722F37"));
             g.drawString("SLOW!", getWidth() / 2 - 25, 250);
         }
 
-      
     }
 }
