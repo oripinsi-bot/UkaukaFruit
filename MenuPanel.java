@@ -2,14 +2,13 @@
  * MenuPanel.java - หน้าเมนูหลัก
  */
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import javax.imageio.ImageIO;
+import javax.swing.*;
 
-
-public class MenuPanel extends JPanel{
+public class MenuPanel extends JPanel {
 
     /* สิ่งที่ต้องมี :
 
@@ -28,47 +27,51 @@ public class MenuPanel extends JPanel{
     private BufferedImage backgroundImage;
 
     public MenuPanel(Main game) {
-        //แสดงคำทักทาย
 
+        // แสดงคำทักทาย
         this.game = game;
 
         // โหลดรูปพื้นหลัง
         try {
             backgroundImage = ImageIO.read(
-                    new File("UkaukaFruit-main/images/background.png")
+                new File("UkaukaFruit-main/images/background.png")
             );
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        setLayout(new BorderLayout(20, 20));
-
         // ทำให้ JPanel โปร่งใส
+        setLayout(new GridBagLayout());
         setOpaque(false);
 
-        JPanel topPanel = new JPanel();
-
-        topPanel.setLayout(
-                new BoxLayout(topPanel, BoxLayout.Y_AXIS)
+        // รวมข้อความและปุ่มทั้งหมดไว้ใน Panel เดียว
+        JPanel contentPanel = new JPanel();
+        contentPanel.setLayout(
+            new BoxLayout(contentPanel, BoxLayout.Y_AXIS)
         );
+        contentPanel.setOpaque(false);
 
+        // =========================
+        // ส่วนข้อความ MENU
+        // =========================
+        JPanel topPanel = new JPanel();
+        topPanel.setLayout(
+            new BoxLayout(topPanel, BoxLayout.Y_AXIS)
+        );
         topPanel.setOpaque(false);
 
         JLabel title = new JLabel("MENU", SwingConstants.CENTER);
-
-        title.setFont(new Font("Tahoma", Font.BOLD, 32));
-
+        title.setFont(new Font("Tahoma", Font.BOLD, 48));
         title.setForeground(Color.WHITE);
-
         title.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // แสดงชื่อผู้เล่นที่ Login เข้ามา
         helloLabel = new JLabel(
-                "hello " + Main.currentPlayerName,
-                SwingConstants.CENTER
+            "hello " + Main.currentPlayerName,
+            SwingConstants.CENTER
         );
 
-        helloLabel.setFont(new Font("Tahoma", Font.BOLD, 24));
+        helloLabel.setFont(new Font("Tahoma", Font.BOLD, 36));
         helloLabel.setForeground(Color.WHITE);
         helloLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
@@ -77,19 +80,22 @@ public class MenuPanel extends JPanel{
         topPanel.add(Box.createVerticalStrut(10));
         topPanel.add(helloLabel);
 
-        // เพิ่ม topPanel เข้า MenuPanel
-        add(topPanel, BorderLayout.NORTH);
+        // เพิ่มส่วนข้อความลงใน contentPanel
+        contentPanel.add(topPanel);
+        contentPanel.add(Box.createVerticalStrut(35));
 
-        //การทำงานของแต่ละปุ่ม
+        // =========================
+        // ส่วนปุ่มเมนู
+        // =========================
 
         // สร้างปุ่ม
         JPanel buttonPanel = new JPanel();
 
         buttonPanel.setLayout(
-                new BoxLayout(buttonPanel, BoxLayout.Y_AXIS)
+            new BoxLayout(buttonPanel, BoxLayout.Y_AXIS)
         );
 
-        //พื้นหลังโปร่งใส
+        // พื้นหลังโปร่งใส
         buttonPanel.setOpaque(false);
 
         JButton playButton = new JButton("Play");
@@ -97,29 +103,46 @@ public class MenuPanel extends JPanel{
         JButton backButton = new JButton("Back");
 
         // กำหนดขนาดปุ่ม
-        Dimension buttonSize = new Dimension(180, 45);
+        Dimension buttonSize = new Dimension(270, 66);
 
-        playButton.setPreferredSize(buttonSize);
-        playButton.setMaximumSize(buttonSize);
+        JButton[] menuButtons = {
+            playButton,
+            leaderBoardButton,
+            backButton
+        };
 
-        leaderBoardButton.setPreferredSize(buttonSize);
-        leaderBoardButton.setMaximumSize(buttonSize);
+        for (JButton button : menuButtons) {
 
-        backButton.setPreferredSize(buttonSize);
-        backButton.setMaximumSize(buttonSize);
+            button.setPreferredSize(buttonSize);
+            button.setMinimumSize(buttonSize);
+            button.setMaximumSize(buttonSize);
 
-        // จัดตรงกลาง
-        playButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        leaderBoardButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        backButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+            button.setFont(new Font("Tahoma", Font.BOLD, 18));
 
-        buttonPanel.add(playButton);
-        buttonPanel.add(Box.createVerticalStrut(15));
-        buttonPanel.add(leaderBoardButton);
-        buttonPanel.add(Box.createVerticalStrut(15));
-        buttonPanel.add(backButton);
+            // จัดตรงกลาง
+            button.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        add(buttonPanel, BorderLayout.CENTER);
+            buttonPanel.add(button);
+            buttonPanel.add(Box.createVerticalStrut(20));
+        }
+
+        // ลบช่องว่างหลังปุ่มสุดท้าย
+        buttonPanel.remove(
+            buttonPanel.getComponentCount() - 1
+        );
+
+        // เพิ่มกลุ่มปุ่มใต้ข้อความ
+        contentPanel.add(buttonPanel);
+
+        // จัดข้อความและปุ่มให้อยู่กลางหน้าจอ
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.CENTER;
+
+        add(contentPanel, gbc);
+
+        // การทำงานของแต่ละปุ่ม
 
         // ปุ่ม Play
         playButton.addActionListener(e -> {
@@ -135,13 +158,12 @@ public class MenuPanel extends JPanel{
         backButton.addActionListener(e -> {
             game.showCard(Main.CARD_LOGIN);
         });
-
     }
 
     // อัปเดตชื่อผู้เล่นเมื่อเข้าสู่หน้า Menu
     public void updatePlayerName() {
         helloLabel.setText(
-                "hello " + Main.currentPlayerName
+            "hello " + Main.currentPlayerName
         );
     }
 
@@ -153,28 +175,26 @@ public class MenuPanel extends JPanel{
 
         if (backgroundImage != null) {
 
-            Graphics2D g2 =
-                    (Graphics2D) g.create();
+            Graphics2D g2 = (Graphics2D) g.create();
 
             g2.drawImage(
-                    backgroundImage,
-                    0,
-                    0,
-                    getWidth(),
-                    getHeight(),
-                    this
+                backgroundImage,
+                0,
+                0,
+                getWidth(),
+                getHeight(),
+                this
             );
 
             g2.dispose();
-
         }
-
     }
 
-
-    //อ่านชื่อผู้เล่นจาก players.txt
-    /*private String readPlayerName(String currentPlayerName) {
-        try (BufferedReader br = new BufferedReader(new FileReader("players.txt"))) {
+    // อ่านชื่อผู้เล่นจาก players.txt
+    /*
+    private String readPlayerName(String currentPlayerName) {
+        try (BufferedReader br =
+                new BufferedReader(new FileReader("players.txt"))) {
 
             String line;
 
@@ -197,11 +217,12 @@ public class MenuPanel extends JPanel{
             }
 
             return "Player";
+
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
-        }*/
+    }
+    */
 }
