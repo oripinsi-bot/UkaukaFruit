@@ -80,7 +80,7 @@ import java.util.List;
     }
 
     /**
-     * อ่านไฟล์ players.txt เพื่อเช็ก Username และ Password
+     * อ่านไฟล์ players.csvเพื่อเช็ก Username และ Password
      */
     public static Player authenticate(String name, String password) {
         File file = new File(FILE_NAME);
@@ -108,7 +108,7 @@ import java.util.List;
     }
 
     /**
-     * สมัครสมาชิกแล้วเขียนบันทึกลงต่อท้ายไฟล์ players.txt
+     * สมัครสมาชิกแล้วเขียนบันทึกลงต่อท้ายไฟล์ 
      */
     public static boolean register(String name, String password) {
         File file = new File(FILE_NAME);
@@ -139,9 +139,9 @@ import java.util.List;
             return false;
         }
     }
-
+    
     /**
-     * อัปเดตคะแนนล่าสุดกลับลงไฟล์ players.txt
+     * อัปเดตคะแนนล่าสุดกลับลงไฟล์ players.csv
      */
     public void save() {
         File file = new File(FILE_NAME);
@@ -171,6 +171,10 @@ import java.util.List;
             }
         } catch (IOException e) {
             e.printStackTrace();
+
         }
     }
+
+
+
 }
