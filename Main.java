@@ -19,6 +19,11 @@ public class Main extends JFrame {
     private CardLayout cardLayout;
     private JPanel mainContainer;
 
+    public static String currentPlayerName = "";
+
+    private MenuPanel menuPanel;
+    private PlayPanel playPanel;
+
     public Main() {
         setTitle("UkaUkaFruit");
         setSize(375, 812);
@@ -28,12 +33,37 @@ public class Main extends JFrame {
         cardLayout = new CardLayout();
         mainContainer = new JPanel(cardLayout);
 
-       
+        mainContainer.add(new LoginPanel(this), CARD_LOGIN);
+        mainContainer.add(new SignUpPanel(this), CARD_SIGNUP);
+        menuPanel = new MenuPanel(this);
+        mainContainer.add(menuPanel, CARD_MENU);
+        playPanel = new PlayPanel(this);
+        mainContainer.add(playPanel, CARD_PLAY);  // ← Use the SAME instance
+        mainContainer.add(new LeaderboardPanel(this), CARD_LEADERBOARD);
+        mainContainer.add(new TimesUpPanel(this), CARD_TIMEUP);
+
         add(mainContainer);
+        showCard(CARD_SIGNUP);
+        showCard(CARD_LOGIN);
     }
 
     public void showCard(String cardName) {
+
+        // ให้อัปเดตชื่อผู้เล่นก่อนแสดงหน้า Menu
+        if (cardName.equals(CARD_MENU)) {
+            menuPanel.updatePlayerName();
+        }
+
         cardLayout.show(mainContainer, cardName);
+
+        // ถ้าเข้าสู่หน้า Play ให้เริ่มเกม
+        if (cardName.equals(CARD_PLAY)) {
+
+            SwingUtilities.invokeLater(() -> {
+                playPanel.startGame();
+            });
+
+        }
     }
 
     public static void main(String[] args) {
