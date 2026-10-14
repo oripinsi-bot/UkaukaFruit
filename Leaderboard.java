@@ -9,8 +9,8 @@ import java.util.Comparator;
  */
 public class Leaderboard {
 
-    /* สิ่งที่ต้องมี : 
-    
+    /* สิ่งที่ต้องมี :
+
     เมื่อจบเกมหรือเกมโอเวอร์ให้เพิ่มรายการใหม่ เรียงลำดับใหม่ แล้วบันทึกลงไฟล์ scores.txt
 
     ถ้าชื่อไม่มีตรงใน scores.txt ให้เก็บในarryใหม่และเริ่มจัดอันดับ
@@ -46,7 +46,7 @@ public class Leaderboard {
         public String toString() {
             return name + ":" + score;
         }
-        
+
     }
 
     private List<ScoreEntry> entries = new ArrayList<>();

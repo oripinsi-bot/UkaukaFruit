@@ -121,21 +121,21 @@ public class LeaderboardPanel extends JPanel {
     }
 
     @Override
-        protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                if (backgroundImage != null) {
-                        Graphics2D g2 = (Graphics2D) g.create();
-                        g2.drawImage(
-                        backgroundImage,
-                        0,
-                        0,
-                        getWidth(),
-                        getHeight(),
-                        this
-                );
-                g2.dispose();
-                }
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        if (backgroundImage != null) {
+            Graphics2D g2 = (Graphics2D) g.create();
+            g2.drawImage(
+                    backgroundImage,
+                    0,
+                    0,
+                    getWidth(),
+                    getHeight(),
+                    this
+            );
+            g2.dispose();
         }
+    }
 
     public void refreshTable() {
         //อัปเดตข้อมูล Leaderboard
