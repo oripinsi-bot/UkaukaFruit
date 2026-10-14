@@ -30,13 +30,19 @@ public class LoginPanel extends JPanel {
     private JPasswordField passwordField;
     private JButton okButton;
     private JButton signUpButton;
+    private Image background;
+
 
     public LoginPanel(Main game) {
         this.game = game;
 
-        // กำหนดสีพื้นหลังธีมเดียวกับ Main
-        setBackground(Main.BG_DARK);
-
+        setOpaque(false);
+        try {
+        background = new ImageIcon("images/background.png").getImage();
+    } catch (Exception e) {
+        System.err.println("do not dowload backgound " + e.getMessage());
+    }
+      
         setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(8, 8, 8, 8);
@@ -92,6 +98,17 @@ public class LoginPanel extends JPanel {
             game.showCard(Main.CARD_SIGNUP); // สลับไปหน้า SignUp
         });
     }
+
+      @Override
+    protected void paintComponent(Graphics g) {
+    super.paintComponent(g);
+    if (background != null) {
+        g.drawImage(background, 0, 0, getWidth(), getHeight(), this);
+    } else {
+        g.setColor(Main.BG_DARK);
+        g.fillRect(0, 0, getWidth(), getHeight());
+    }
+}
 
     private void onOkClicked() {
         String username = usernameField.getText().trim();

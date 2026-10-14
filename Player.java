@@ -50,7 +50,7 @@ import java.util.List;
 } */
 
     public class Player {
-    private static final String FILE_NAME = "players.txt";
+    private static final String FILE_NAME = "data/players.csv";
 
     private String name;
     private String password;

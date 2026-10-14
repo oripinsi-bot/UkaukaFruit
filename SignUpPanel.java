@@ -29,24 +29,21 @@ public class SignUpPanel extends JPanel {
     private Main game;
     private JTextField usernameField;
     private JPasswordField passwordField;
+    private JPasswordField confirmPasswordField;
     private JButton okButton;
     private JButton backButton;
-    private Image backgroundImage;
+    private Image background;
 
     public SignUpPanel(Main game) {
         this.game = game;
 
-       
-        setBackground(Main.BG_DARK);
-       /*   try {
-            
-            backgroundImage = new ImageIcon(getClass().getResource("/images/bg_forest.png")).getImage();
-        } catch (Exception e) {
-            
-            backgroundImage = null;
-
-            setOpaque(false);
-        } */
+       setOpaque(false);
+        try {
+        background = new ImageIcon("images/background.png").getImage();
+    } catch (Exception e) {
+        System.err.println("do not dowload backgound " + e.getMessage());
+    }
+      
 
         // กำหนด Layout จัดวางตำแหน่ง Component
         setLayout(new GridBagLayout());
@@ -55,7 +52,7 @@ public class SignUpPanel extends JPanel {
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
         // 1. หัวข้อหน้า
-        JLabel titleLabel = new JLabel("Singup", SwingConstants.CENTER);
+        JLabel titleLabel = new JLabel("Sing up", SwingConstants.CENTER);
         titleLabel.setFont(new Font("Tahoma", Font.BOLD, 22));
         titleLabel.setForeground(Main.TEXT_LIGHT);
         gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 2;
@@ -83,12 +80,23 @@ public class SignUpPanel extends JPanel {
         gbc.gridx = 1; gbc.gridy = 2;
         add(passwordField, gbc);
 
-        // 4. ปุ่ม ตกลง (OK)
+        // 4. คอนเฟิร์มรหัส
+        JLabel confirmPassLabel = new JLabel("confirm password:");
+        confirmPassLabel.setFont(new Font("Tahoma", Font.BOLD, 13));
+        confirmPassLabel.setForeground(Main.TEXT_LIGHT);
+        gbc.gridx = 0; gbc.gridy = 3;
+        add(confirmPassLabel, gbc);
+
+        confirmPasswordField = new JPasswordField(15);
+        gbc.gridx = 1; gbc.gridy = 3;
+        add(confirmPasswordField, gbc);
+
+        // 5. ปุ่ม ตกลง (OK)
         okButton = new JButton("ok");
-        gbc.gridx = 0; gbc.gridy = 3; gbc.gridwidth = 2;
+        gbc.gridx = 0; gbc.gridy = 4; gbc.gridwidth = 2;
         add(okButton, gbc);
 
-        // 5. ปุ่มลิงก์กลับไปหน้า Login
+        // 6. ปุ่มลิงก์กลับไปหน้า Login
         backButton = new JButton("Already have an account? Back to Login");
         backButton.setBorderPainted(false);
         backButton.setContentAreaFilled(false);
@@ -105,30 +113,37 @@ public class SignUpPanel extends JPanel {
         });
     }
 
-
-    /* @Override
+    @Override
     protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        if (backgroundImage != null) {
-            // วาดภาพยืดให้เต็มขนาด Panel (getWidth(), getHeight())
-            g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
-        } else {
-            // ถ้าไม่มีรูป ให้แสดงสีพื้นหลังสำรอง
-            g.setColor(Main.BG_DARK);
-            g.fillRect(0, 0, getWidth(), getHeight());
-        }
-    } */
+    super.paintComponent(g);
+    if (background != null) {
+        g.drawImage(background, 0, 0, getWidth(), getHeight(), this);
+    } else {
+        g.setColor(Main.BG_DARK);
+        g.fillRect(0, 0, getWidth(), getHeight());
+    }
+}
 
 
     private void onOkClicked() {
         String username = usernameField.getText().trim();
         String password = new String(passwordField.getPassword());
+        String confirmPassword = new String(confirmPasswordField.getPassword());
 
         // ตรวจสอบข้อมูลเบื้องต้น
         if (username.isEmpty() || password.isEmpty()) {
             JOptionPane.showMessageDialog(this,
                 "Please enter both username and password.",
                 "error!",
+                JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+       //ตรวจสอบรหัส 
+        if (!password.equals(confirmPassword)) {
+            JOptionPane.showMessageDialog(this,
+                "Passwords do not match.",
+                "Error",
                 JOptionPane.WARNING_MESSAGE);
             return;
         }
