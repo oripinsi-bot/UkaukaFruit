@@ -12,19 +12,19 @@ public class PlayPanel extends JPanel implements ActionListener, KeyListener {
 
     // กำหนดตัวแปรค่าคงที่จะได้ไม่ต้องเปลี่ยนค่าทีละที่
     private static final int TICK_MS = 20;
-    private static final int TICKS_PER_SECOND = 1000 / TICK_MS; // 50
+    private static final int TICKS_PER_SECOND = 1000 / TICK_MS; //ใน 1 วิมีกี่ Ticks
     private static final int SPAWN_INTERVAL_TICKS = 47; // ~0.94 วินาที
     private static final int NORMAL_SPEED = 7;
-    private static final int SLOW_SPEED = 3; // โดนน้องเห็ด
-    private static final int SLOW_DURATION_TICKS = 3 * TICKS_PER_SECOND; // 3 วินาที
+    private static final int SLOW_SPEED = 3; 
+    private static final int SLOW_DURATION_TICKS = 3 * TICKS_PER_SECOND; //150 Ticks = 3 วิ
 
     // กรอบตัวรับของ
-    private static final int CATCH_OFFSET_Y = 28; // ระยะจากขอบบนรูปลิงลงมาถึงมือ
-    private static final int CATCH_HEIGHT = 30;
-    private static final int CATCH_INSET_LEFT = 8; // ย่นกรอบรับของเข้ามาจากขอบซ้ายรูปลิง
-    private static final int CATCH_INSET_RIGHT = 10; // ย่นจากขอบขวา
-    private static final int BASKET_BOTTOM_MARGIN = -20; // ระยะจากขอบล่างจอถึงก้นรูปลิง
-    private static final boolean DEBUG_HITBOX = false; // เปลี่ยนเป็น true เพื่อดูกรอบชนตอนจูนค่า
+    private static final int CATCH_OFFSET_Y = 28;          //ขอบบนรูปลิงลงมาถึงมือ
+    private static final int CATCH_HEIGHT = 30;            //ความสูงกล่อง
+    private static final int CATCH_INSET_LEFT = 8;         //ขอบซ้ายกล่อง
+    private static final int CATCH_INSET_RIGHT = 10;       //ขอบขวากล่อง
+    private static final int BASKET_BOTTOM_MARGIN = -20;   //ขอบล่างจอถึงก้นรูปลิง
+    private static final boolean DEBUG_HITBOX = false;     //เปลี่ยนเป็น true เพื่อดูกรอบตอนชน
 
     private Main game;
     private GameManager manager;
@@ -140,7 +140,7 @@ public class PlayPanel extends JPanel implements ActionListener, KeyListener {
 
                 // ถ้าชนน้องเห็ดพิษ ติดสถานะช้า 3 วินาที
                 if (obj.getType() == FallingObject.Type.MUSHROOM) {
-                    slowTicks = SLOW_DURATION_TICKS; // [แก้ #5]
+                    slowTicks = SLOW_DURATION_TICKS;  
                 }
 
                 fallingObjects.remove(i); // ลบออกเมื่อเก็บได้
@@ -152,7 +152,7 @@ public class PlayPanel extends JPanel implements ActionListener, KeyListener {
         }
 
         // นับถอยหลังเวลาทุกๆ 1 วินาที (50 รอบ * 20ms = 1000ms)
-        if (tickCount % TICKS_PER_SECOND == 0) { // [แก้ #5]
+        if (tickCount % TICKS_PER_SECOND == 0) { 
             manager.tickOneSecond();
             if (manager.isTimeUp()) {
                 endGame();
