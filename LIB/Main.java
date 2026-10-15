@@ -40,14 +40,14 @@ public class Main extends JFrame {
         menuPanel = new MenuPanel(this);
         playPanel = new PlayPanel(this);
         timesUpPanel = new TimesUpPanel(this);
-        leaderboardPanel = new LeaderboardPanel(this); // 🟢 [แก้ไข] สร้างและเก็บไว้ในตัวแปร
+        leaderboardPanel = new LeaderboardPanel(this); // สร้างและเก็บไว้ในตัวแปร
 
         mainContainer.add(new LoginPanel(this), CARD_LOGIN);
         mainContainer.add(new SignUpPanel(this), CARD_SIGNUP);
         mainContainer.add(menuPanel, CARD_MENU);
         mainContainer.add(playPanel, CARD_PLAY);
-        mainContainer.add(leaderboardPanel, CARD_LEADERBOARD); // 🟢 [แก้ไข] ใส่ตัวแปร leaderboardPanel
-        mainContainer.add(timesUpPanel, CARD_TIMEUP);          // 🟢 [แก้ไข] ใส่ตัวแปร timesUpPanel (ไม่ใส่ new ซ้ำ)
+        mainContainer.add(leaderboardPanel, CARD_LEADERBOARD); // ใส่ตัวแปร leaderboardPanel
+        mainContainer.add(timesUpPanel, CARD_TIMEUP);          // ใส่ตัวแปร timesUpPanel (ไม่ใส่ new ซ้ำ)
 
         add(mainContainer);
         showCard(CARD_LOGIN);
@@ -59,7 +59,7 @@ public class Main extends JFrame {
             menuPanel.updatePlayerName();
         }
 
-        // 🟢 [เพิ่ม] สั่งให้อัปเดตตาราง Leaderboard ทุกครั้งที่สลับมาหน้านี้
+        // สั่งให้อัปเดตตาราง Leaderboard ทุกครั้งที่สลับมาหน้านี้
         if (cardName.equals(CARD_LEADERBOARD) && leaderboardPanel != null) {
             leaderboardPanel.refreshTable();
         }
