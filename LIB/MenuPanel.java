@@ -3,9 +3,6 @@
  */
 
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.*;
-import javax.imageio.ImageIO;
 import javax.swing.*;
 
 public class MenuPanel extends JPanel {
@@ -20,7 +17,7 @@ public class MenuPanel extends JPanel {
 
     */
 
-    private Main game;
+    private final Main game;
     private JLabel helloLabel;
 
     // รูปพื้นหลัง
@@ -144,17 +141,17 @@ public class MenuPanel extends JPanel {
 
         // ปุ่ม Play
         playButton.addActionListener(e -> {
-            game.showCard(Main.CARD_PLAY);
+            this.game.showCard(Main.CARD_PLAY);
         });
 
         // ปุ่ม LeaderBoard
         leaderBoardButton.addActionListener(e -> {
-            game.showCard(Main.CARD_LEADERBOARD);
+            this.game.showCard(Main.CARD_LEADERBOARD);
         });
 
         // ปุ่ม Back
         backButton.addActionListener(e -> {
-            game.showCard(Main.CARD_LOGIN);
+            this.game.showCard(Main.CARD_LOGIN);
         });
     }
 
