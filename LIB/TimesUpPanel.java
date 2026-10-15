@@ -135,7 +135,7 @@ public class TimesUpPanel extends JPanel {
 
         // 1. บันทึกคะแนนเข้า Player และลงไฟล์ CSV
         if (player != null) {
-            player.setScore(finalScore);
+            player.updateScore(finalScore);
             player.save();
         }
 
