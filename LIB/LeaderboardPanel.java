@@ -1,14 +1,10 @@
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import javax.imageio.ImageIO;
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.util.List;
 
 public class LeaderboardPanel extends JPanel {
-    private Main game;
+    private final Main game;
 
     private JTable table;
     private DefaultTableModel tableModel;
@@ -104,7 +100,7 @@ public class LeaderboardPanel extends JPanel {
         backButton.addActionListener(e -> {
 
             // กลับไปหน้า Menu
-            game.showCard(game.CARD_MENU);
+            this.game.showCard(Main.CARD_MENU);
         });
 
         bottomPanel.add(backButton);
